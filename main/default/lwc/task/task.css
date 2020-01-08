@@ -1,0 +1,38 @@
+.slds-scrollable_y ,.slds-scrollable--y
+{
+    overflow: visible !important;
+    overflow-y: visible !important; 
+}
+.slds-m-around_medium
+{
+    height: 800px !important;
+}
+
+.datatable
+{
+    height: 800px !important;  
+}
+.redcolor svg{
+    fill : red  !important;
+}
+.redcolor{
+    color: red  !important ;
+}
+.redcolor a{
+    color: red   !important;
+}
+.redcolor svg{
+    fill: red !important;
+}
+.blackcolor svg{
+    fill : black  !important; 
+}
+.blackcolor{
+    color : black  !important;
+}
+.blackcolor a{
+    color : black  !important;
+}
+.blackcolor svg{
+    color : black !important;
+}

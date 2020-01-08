@@ -1,0 +1,171 @@
+<template>
+    <lightning-card title="Task" icon-name="custom:custom63">
+
+        <div style="width:100%;"> 
+                <table  style="width:100%;">
+                    
+                    <tr>
+                    <td  style="width:20%;padding-left: 5%;">
+                        <!--  In this shell UseCsae 1 is implemented   -->
+                    <lightning-input type="search" label="Enter Name"  value={str}  onchange={handleChange} placeholder="type here..." ></lightning-input>     
+                    </td>
+                    <td  style="width:20%;padding-left: 5%;padding-top: 1%;">
+                        <!--  Here the Picklist is created in which filters are applied  it consists of UseCase 6 -->
+                    <select class="slds-select" name = "optionSelect"  value={picklistValue} onchange={changeInFilter} >
+                        <option value="none">--None--</option>
+                        <option value="notdue">Not Due Tasks</option>
+                        <option value="dueToday"> Due Today</option>
+                        <option value="dueTommorow"> Due Tommorow</option>
+                        <option value="due">Due Tasks</option>
+                        <option value="completed">Completed</option>
+                    </select> 
+
+                    </td>
+                    <td  style="width:60%;padding-left: 50%;">
+                        <!--  This  is a button by clicking on it you can create a new record-->
+                    <lightning-button label="New" title="Non-primary action" onclick={openCreateRecords} class="slds-m-left_x-small"></lightning-button>
+
+                    </td>
+                    </tr>
+                </table>
+
+        </div>
+        <div class="slds-m-around_medium">
+            <template if:true={data}>
+                
+            <br/>
+            <!--  Here  the UseCase 2 is implemented -->
+                <lightning-datatable
+                    data={data}
+                    columns={columns} 
+                    key-field="Id"
+                    class="datatable"
+            draft-values={draftValues}  onrowaction={handleRowActions}
+            ></lightning-datatable>
+            <!--  In bove tag lightning data-table is used and here the All records list will be represented  --> 
+            </template>
+            <template if:true={error}>
+                {error}
+            </template>                
+        </div>
+            <!-- Spinner -->
+            <div if:true={showLoadingSpinner}>
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+        </div>
+
+        <!-- Detail view modal  UseCase 3 is represented here where we can see the details of the particular record-->
+        <template if:true={bShowModal}>
+            <section role="dialog" tabindex="-1"
+                    aria-labelledby="modal-heading-01"
+                    aria-modal="true"
+                    aria-describedby="modal-content-id-1"
+                    class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- modal header -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                    </button>
+                    
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" if:false={isEditForm}>Record Detail</h2>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate" if:true={isEditForm}>Update Record Values</h2>
+                </header>
+                <!-- modal body -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" if:false={isEditForm}>
+                    <dl class="slds-list_horizontal slds-wrap">
+                        <dt class="slds-item_label slds-truncate" title="Name"> Name:</dt>
+                        <dd class="slds-item_detail slds-truncate">{record.Name}</dd>
+                        <dt class="slds-item_label slds-truncate" title="Description">Description</dt>
+                        <dd class="slds-item_detail slds-truncate">{record.Description__c}</dd>
+                        <dt class="slds-item_label slds-truncate" title="Status">Status </dt>
+                        <dd class="slds-item_detail slds-truncate">{record.Status__c}</dd>
+                        <dt class="slds-item_label slds-truncate" title="Due Date">Due Date </dt>
+                        <dd class="slds-item_detail slds-truncate">{record.Due_Date__c}</dd>
+                    </dl>
+                </div>
+                
+                <!-- showing record edit form this is used to edit a particular record 
+                    It contains the UseCase4 -->
+                <div if:true={isEditForm} class="slds-theme_default"  style="padding-left:10%;padding-right:10%;">
+                    <lightning-record-edit-form layout-type="Full" record-id={currentRecordId} object-api-name="Task__c" onsubmit={handleSubmit} onsuccess={handleSuccess}>
+                        <lightning-messages></lightning-messages>
+                        <lightning-input-field field-name="Name"></lightning-input-field>
+                        <lightning-input-field field-name="Description__c"></lightning-input-field>
+                        <lightning-input-field field-name="Status__c"></lightning-input-field>
+                        <lightning-input-field field-name="Due_Date__c"></lightning-input-field><br/>
+                        
+                        <div style="text-align:center;">
+                            <lightning-button class="slds-m-top_small"
+                                                variant="brand"
+                                                type="submit"
+                                                name="update"
+                                                label="Update Record"></lightning-button>
+                        </div>
+                    </lightning-record-edit-form><br/>
+                    <div></div>
+                </div>
+
+                <!-- modal footer start  it is only to close the pop up -->
+                <footer class="slds-modal__footer" if:false={isEditForm}>
+                    <lightning-button variant="brand"
+                                        label="Close"
+                                        title="Close"
+                                        onclick={closeModal}></lightning-button>
+                </footer>
+            </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+        
+
+        <template if:true={openCreateRecord}>
+            <div class="demo-only" style="height: 640px;">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                                <lightning-icon icon-name="utility:close" size="medium">
+                                </lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2  class="slds-text-heading_medium slds-hyphenate">Create New Task</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-">
+
+
+
+                            <div class="form-group">
+                                <lightning-input label="Enter Task Name" name="taskName" required="required" type="text" value={taskRecord.Name} onchange={handleNameChange}></lightning-input>
+                            </div>
+                            <div class="form-group">
+                                <lightning-input label="Enter Description" name="description" type="text" value={taskRecord.Description__c} onchange={handledescriptionChange}></lightning-input>
+                            </div>
+                            <br/>
+                            <div class="form-group">
+                                    <select class="slds-select" label="Select Status" name = "status"  value={taskRecord.Status__c} onchange={handlestatusChange} >
+                                            <option value="">--None--</option>
+                                            <option value="Not Started">Not Started</option>
+                                            <option value="Started">Started</option>
+                                            <option value="In Progress"> In Progress</option>
+                                            <option value="Completed">Completed</option>
+                                            <option value="Failed">Failed</option>
+                                        </select> 
+                                </div>
+                            <div class="form-group">
+                                <lightning-input label="Enter Due Date" name="dueDate" type="Date" value={taskRecord.Due_Date__c} onchange={handleduedateChange}></lightning-input>
+                            </div>
+
+
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" variant="neutral" onclick={closeCreateRecord}></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <lightning-button label="Save" variant="brand" onclick={saveCreateRecord}></lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+            </template>
+        
+    </lightning-card> 
+    </template>
