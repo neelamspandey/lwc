@@ -1,5 +1,5 @@
 import { LightningElement, wire,track } from 'lwc';
-import getAccountList from '@salesforce/apex/TaskController.getTaskList';
+import getTaskList from '@salesforce/apex/TaskController.getTaskList';
 import getTaskListWithFilter from '@salesforce/apex/TaskController.getTaskListWithFilter';
 import { updateRecord } from 'lightning/uiRecordApi';
 import { refreshApex } from '@salesforce/apex';
@@ -101,7 +101,7 @@ export default class Task extends LightningElement {
     }
 
 ];
-    @wire(getAccountList , {str:null})
+    @wire(getTaskList , {str:null})
     wiredAccounts({ error, data }) { // this function is initiallized at the time of page loading
         if (data) {
             var response = JSON.parse(data) ;  // here we are parsing the data from JSON to Array
@@ -127,7 +127,7 @@ export default class Task extends LightningElement {
                     console.log('tommorow',tommorow);
                     console.log('tempDate',tempDate);
                     console.log('record.Due_Date__c',record.Due_Date__c);
-                    // based on VIP Account field value set the icon and style class to each record mportant3
+                    
                     if(record.Status__c  != 'Completed' && ( record.Due_Date__c ==  tempDate ||  record.Due_Date__c  == tommorow  )){
                         record.showClass = (record.Status__c != 'Completed' ? 'background-color:yellow !important;' : 'color:black !important;');
                         record.displayIconName = 'utility:check';   
@@ -156,7 +156,7 @@ export default class Task extends LightningElement {
         console.log('Current value of the input: ' + searchKey);  // searchkey that string to be sent in the Apex Controller
         // eslint-disable-next-line @lwc/lwc/no-async-operation
         this.delayTimeout = setTimeout(() => {
-            getAccountList({ str : searchKey })  // Apex Function is called here now
+            getTaskList({ str : searchKey })  // Apex Function is called here now
                 .then(result => {
                    
                        var response = JSON.parse(result) ;
@@ -257,7 +257,7 @@ deleteCons(currentRow)
           
         // refreshing table data using refresh apex
         this.delayTimeout = setTimeout(() => {
-            getAccountList({ str : '' })
+            getTaskList({ str : '' })
                 .then(result => {
                    
                 var response = JSON.parse(result) ;
@@ -276,7 +276,6 @@ deleteCons(currentRow)
         response.forEach(function(record){ 
             if(typeof record.Id != 'undefined'){ 
                 var dueDate =  new Date(record.Due_Date__c);
-                // based on VIP Account field value set the icon and style class to each record mportant3
                 // https://www.lightningdesignsystem.com/icons/#utility 
                 if(record.Status__c  != 'Completed' && ( record.Due_Date__c ==  tempDate ||  record.Due_Date__c  == tommorow  )){
                     record.showClass = (record.Status__c != 'Completed' ? 'background-color:yellow !important;' : 'color:black !important;');
@@ -383,7 +382,7 @@ closeModal() {
 handleSuccess() {
     // refreshing table data using refresh apex
     this.delayTimeout = setTimeout(() => {
-        getAccountList({ str : '' })
+        getTaskList({ str : '' })
             .then(result => {
                
                 var response = JSON.parse(result) ;
@@ -442,7 +441,7 @@ changeInFilter(event)
     if( this.picklistValue == 'none')
     {
         this.delayTimeout = setTimeout(() => {
-            getAccountList({ str : '' })
+            getTaskList({ str : '' })
                 .then(result => {
                    
                     
@@ -468,7 +467,6 @@ changeInFilter(event)
                         var dueDate =  new Date(record.Due_Date__c);
                         console.log('dueDate',dueDate);
                         console.log('record.Due_Date__c',record.Due_Date__c);
-                        // based on VIP Account field value set the icon and style class to each record mportant3
                         // https://www.lightningdesignsystem.com/icons/#utility 
                         if(record.Status__c  != 'Completed' && ( record.Due_Date__c ==  tempDate ||  record.Due_Date__c  == tommorow  )){
                             record.showClass = (record.Status__c != 'Completed' ? 'background-color:yellow !important;' : 'color:black !important;');
