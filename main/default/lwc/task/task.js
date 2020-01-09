@@ -108,13 +108,13 @@ export default class Task extends LightningElement {
             var today = new Date();    // here we have create a new todays date for the comaprison 
             if ( today.getMonth()+1 >9 )
             {
-                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+2);
+                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-0'+today.getDate();
+                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
             }
             else
             {
-                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+2);
+                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
             }
           //  here we are gong to compare the date and  setting the colours in the rows
             // iterate each records with forEach loop
@@ -127,7 +127,7 @@ export default class Task extends LightningElement {
                     console.log('tommorow',tommorow);
                     console.log('tempDate',tempDate);
                     console.log('record.Due_Date__c',record.Due_Date__c);
-                    
+                    // based on VIP Account field value set the icon and style class to each record mportant3
                     if(record.Status__c  != 'Completed' && ( record.Due_Date__c ==  tempDate ||  record.Due_Date__c  == tommorow  )){
                         record.showClass = (record.Status__c != 'Completed' ? 'background-color:yellow !important;' : 'color:black !important;');
                         record.displayIconName = 'utility:check';   
@@ -150,30 +150,32 @@ export default class Task extends LightningElement {
             this.error = error;
         }
     }
+    
+    // This function search the task by task Name.
     handleChange(event) {
-        var searchKey = event.target.value;  // on the searching the task per name this function is called 
+        var searchKey = event.target.value;  
         this.picklistValue = 'none'; 
         console.log('Current value of the input: ' + searchKey);  // searchkey that string to be sent in the Apex Controller
         // eslint-disable-next-line @lwc/lwc/no-async-operation
         this.delayTimeout = setTimeout(() => {
-            getTaskList({ str : searchKey })  // Apex Function is called here now
+            getTaskList({ str : searchKey })  // Apex Function is called here to get data from Task Object.
                 .then(result => {
                    
                        var response = JSON.parse(result) ;
                 var today = new Date();
                 if ( today.getMonth()+1 >9 )
-            {
-                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
-            else
-            {
-                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
+                {
+                    var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-0'+today.getDate();
+                    var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+                }
+                else
+                {
+                    var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+                    var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+                }
                
-                // iterate each records with forEach loop
-                 // this is for the UseCase 8
+                // Iterate each records with forEach loop
+
                 response.forEach(function(record){ 
                     if(typeof record.Id != 'undefined'){ 
                         var dueDate =  new Date(record.Due_Date__c);
@@ -251,31 +253,31 @@ deleteCons(currentRow)
         // showing success message
         this.dispatchEvent(new ShowToastEvent({
             title: 'Success!!',
-            message: currentRow.FirstName + ' '+ currentRow.LastName +' Contact deleted.',
+            message: currentRow.Name + ' ' + ' Task deleted.',
             variant: 'success'
         }),);
           
         // refreshing table data using refresh apex
         this.delayTimeout = setTimeout(() => {
-            getTaskList({ str : '' })
+            getAccountList({ str : '' })
                 .then(result => {
                    
                 var response = JSON.parse(result) ;
         var today = new Date();
         if ( today.getMonth()+1 >9 )
-            {
-                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
-            else
-            {
-                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
-        // iterate each records with forEach loop
+        {
+            var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-0'+today.getDate();
+            var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+        }
+        else
+        {
+            var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+            var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+        }  // iterate each records with forEach loop
         response.forEach(function(record){ 
             if(typeof record.Id != 'undefined'){ 
                 var dueDate =  new Date(record.Due_Date__c);
+                // based on VIP Account field value set the icon and style class to each record mportant3
                 // https://www.lightningdesignsystem.com/icons/#utility 
                 if(record.Status__c  != 'Completed' && ( record.Due_Date__c ==  tempDate ||  record.Due_Date__c  == tommorow  )){
                     record.showClass = (record.Status__c != 'Completed' ? 'background-color:yellow !important;' : 'color:black !important;');
@@ -330,7 +332,7 @@ handleSubmit(event) {
     // showing success message
     this.dispatchEvent(new ShowToastEvent({
         title: 'Success!!',
-        message: event.detail.fields.Name + ' ' +' Contact updated Successfully!!.',
+        message: event.detail.fields.Name + ' ' +' Task Status updated Successfully!!.',
         variant: 'success'
     }),);
     this.handleSuccess();
@@ -367,7 +369,7 @@ closeModal() {
             this.handleSuccess();
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Success!!',
-                message: 'Account Created Successfully!!',
+                message: 'Task Created Successfully!!',
                 variant: 'success'
             }),);
         })
@@ -389,15 +391,15 @@ handleSuccess() {
         var today = new Date();
         if ( today.getMonth()+1 >9 )
             {
-                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+2);
+                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-0'+today.getDate();
+                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
             }
             else
             {
-                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+2);
+                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
             }
-        console.log('Success' + response);
+            console.log('Success' + response);
         console.log('today',today);
         console.log('tempDate',tempDate);
         console.log('tommorow',tommorow);
@@ -421,7 +423,7 @@ handleSuccess() {
                 record.linkName = '/'+record.Id;   
             }
         });
-        // after the loop set the updated account records on data attribute
+        // after the loop set the updated task records on data attribute
         this.data =response;
                 this.error = undefined;
             })
@@ -448,15 +450,15 @@ changeInFilter(event)
                 var response = JSON.parse(result) ;
                 var today = new Date();
                 if ( today.getMonth()+1 >9 )
-            {
-                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
-            else
-            {
-                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
+                {
+                    var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-0'+today.getDate();
+                    var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+                }
+                else
+                {
+                    var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+                    var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+                }
                 console.log('Success' + response);
                 console.log('today',today);
                 console.log('tempDate',tempDate);
@@ -467,7 +469,7 @@ changeInFilter(event)
                         var dueDate =  new Date(record.Due_Date__c);
                         console.log('dueDate',dueDate);
                         console.log('record.Due_Date__c',record.Due_Date__c);
-                        // https://www.lightningdesignsystem.com/icons/#utility 
+                     
                         if(record.Status__c  != 'Completed' && ( record.Due_Date__c ==  tempDate ||  record.Due_Date__c  == tommorow  )){
                             record.showClass = (record.Status__c != 'Completed' ? 'background-color:yellow !important;' : 'color:black !important;');
                             record.displayIconName = 'utility:check';   
@@ -480,7 +482,7 @@ changeInFilter(event)
                         record.linkName = '/'+record.Id;   
                     }
                 });
-                // after the loop set the updated account records on data attribute
+                // after the loop set the updated task records on data attribute
                 this.data =response;
                     this.error = undefined;
                 })
@@ -500,15 +502,15 @@ changeInFilter(event)
                 var response = JSON.parse(result) ;
                 var today = new Date();
                 if ( today.getMonth()+1 >9 )
-            {
-                var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
-            else
-            {
-                var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
-                var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+2);
-            }
+                {
+                    var tempDate = ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-0'+today.getDate();
+                    var tommorow =  ''+today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+                }
+                else
+                {
+                    var tempDate = ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+                    var tommorow =  ''+today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+(today.getDate()+1);
+                }
                 console.log('Success' + response);
                 console.log('today',today);
                 console.log('tempDate',tempDate);
